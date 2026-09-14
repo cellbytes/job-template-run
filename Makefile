@@ -20,6 +20,7 @@ build:
 	kind load --name $(KIND_CLUSTER_NAME) docker-image $(DOCKER_IMAGE):$$(git rev-parse --short HEAD)
 
 lint:
+	uv run ty check
 	helm lint $(HELM_CHART)
 
 helm-install:

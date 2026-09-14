@@ -2,12 +2,21 @@
 
 import base64
 import unittest.mock as mock
+from collections.abc import Callable
+from typing import cast
 
 import kopf
 import pytest
 from kubernetes.client.exceptions import ApiException
 
 import controller
+
+
+# kopf's decorators re-type the handlers as protocols that demand every kwarg
+# kopf itself would pass. The handlers take only the fields they act on and
+# swallow the rest through `**_`, so the tests call them through these aliases.
+jobrun_reconcile = cast(Callable[..., None], controller.jobrun_reconcile)
+job_status_update = cast(Callable[..., None], controller.job_status_update)
 
 
 MINIMAL_TEMPLATE = {
@@ -203,7 +212,7 @@ def _call_reconcile(*, spec, status=None, patch=None, existing_jobs=(), template
             mock_crd.return_value.get_namespaced_custom_object.side_effect = template
         else:
             mock_crd.return_value.get_namespaced_custom_object.return_value = template
-        controller.jobrun_reconcile(
+        jobrun_reconcile(
             spec=spec,
             name="my-run",
             namespace="default",
@@ -315,7 +324,7 @@ def test_reconcile_treats_conflict_as_created():
         mock_batch.return_value.create_namespaced_job.side_effect = ApiException(
             status=409, reason="Conflict"
         )
-        controller.jobrun_reconcile(
+        jobrun_reconcile(
             spec={"templateRef": "my-template"},
             name="my-run",
             namespace="default",
@@ -373,7 +382,7 @@ def _call_status_update(
     }
     status = {"conditions": conditions}
 
-    controller.job_status_update(
+    job_status_update(
         name=name, namespace=namespace, status=status, meta=meta, event=event
     )
 

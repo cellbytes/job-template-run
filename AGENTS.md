@@ -14,7 +14,7 @@ differ per run.
 
 - Python (see `pyproject.toml` `requires-python`); `uv` for dependencies
   (`uv run`, `uv.lock`).
-- Lint/format: `ruff`. Types: `pyright`. Unit tests: `pytest`.
+- Lint/format: `ruff`. Types: `ty`. Unit tests: `pytest`.
 - Kubernetes e2e: `kind` (local cluster), `helm` (chart in `charts/`), and
   `chainsaw` (declarative e2e tests under `tests/`).
 - Controller entrypoint: `controller.py`.
@@ -26,7 +26,7 @@ See the [Makefile](Makefile) for the full set. Key targets:
 | Command | Purpose |
 | --- | --- |
 | `make build` | Build the controller image and load it into kind. |
-| `make lint` | `helm lint` the chart. |
+| `make lint` | `ty check` the Python and `helm lint` the chart. |
 | `make test` | Run `pytest tests/test_controller.py` then `chainsaw test tests/`. |
 | `make kind` / `make kind-down` | Create / delete the local kind cluster. |
 | `make helm-install` / `make helm-uninstall` | Install / remove the chart. |
@@ -43,7 +43,7 @@ with direct access to kind.
 - Only use ASCII characters in code and comments. No em-dashes, en-dashes,
   unicode arrows, or other special characters.
 - Prefer a functional style; avoid classes.
-- Lint and typecheck both the Python (`ruff`, `pyright`) and the chart
+- Lint and typecheck both the Python (`ruff`, `ty`) and the chart
   (`helm lint`) when you touch either side.
 
 ## Before finishing a change
@@ -51,5 +51,5 @@ with direct access to kind.
 Ensure no lint or type errors and the tests pass:
 
 ```sh
-uv run ruff check && uv run pyright -p pyproject.toml && make lint && make test
+uv run ruff check && uv run ruff format --check && make lint && make test
 ```

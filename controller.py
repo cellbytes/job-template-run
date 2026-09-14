@@ -136,7 +136,7 @@ def create_job(
         kopf.append_owner_reference(job_manifest, owner=owner)
     batch_v1 = client.BatchV1Api()
     # The client serializes a plain dict body; the stub only types V1Job.
-    batch_v1.create_namespaced_job(namespace=namespace, body=job_manifest)  # pyright: ignore[reportArgumentType]
+    batch_v1.create_namespaced_job(namespace=namespace, body=job_manifest)  # ty: ignore[invalid-argument-type]
     return job_name
 
 
@@ -187,9 +187,12 @@ def jobrun_reconcile(spec, name, namespace, patch, status, body, **_):
         namespace,
         label_selector=f"cellbytes.io/job-run={label_value(name)}",
     )
-    if len(existing_jobs.items) > 0:
-        patch.status["jobName"] = existing_jobs.items[0].metadata.name
-        return
+    for existing_job in existing_jobs.items:
+        # The API server always names what it lists; the generated client
+        # models metadata as optional anyway.
+        if existing_job.metadata is not None:
+            patch.status["jobName"] = existing_job.metadata.name
+            return
 
     template_name = spec.get("templateRef")
     if not template_name:
