@@ -1,16 +1,15 @@
 """Unit tests for controller.py reconcile and callback logic."""
 
 import base64
-import unittest.mock as mock
 from collections.abc import Callable
 from typing import cast
+from unittest import mock
 
 import kopf
 import pytest
 from kubernetes.client.exceptions import ApiException
 
 import controller
-
 
 # kopf's decorators re-type the handlers as protocols that demand every kwarg
 # kopf itself would pass. The handlers take only the fields they act on and
@@ -84,13 +83,15 @@ def test_create_job_skips_unset_env_labels():
 
 
 def test_create_job_rejects_template_without_containers():
-    with mock.patch("controller.client.BatchV1Api"):
-        with pytest.raises(ValueError, match="containers"):
-            controller.create_job(
-                name="my-run",
-                namespace="default",
-                template={"metadata": {"name": "broken"}, "spec": {}},
-            )
+    with (
+        mock.patch("controller.client.BatchV1Api"),
+        pytest.raises(ValueError, match="containers"),
+    ):
+        controller.create_job(
+            name="my-run",
+            namespace="default",
+            template={"metadata": {"name": "broken"}, "spec": {}},
+        )
 
 
 def test_create_job_does_not_mutate_template():
@@ -232,7 +233,7 @@ def test_reconcile_creates_job_and_records_job_name():
 
 
 def test_reconcile_skips_when_job_name_recorded():
-    patch, mock_batch = _call_reconcile(
+    _patch, mock_batch = _call_reconcile(
         spec={"templateRef": "my-template"},
         status={"jobName": "my-template-my-run"},
         template=MINIMAL_TEMPLATE,
@@ -243,7 +244,7 @@ def test_reconcile_skips_when_job_name_recorded():
 
 def test_reconcile_skips_when_terminal():
     for terminal in ({"succeeded": 1}, {"failed": 1}):
-        patch, mock_batch = _call_reconcile(
+        _patch, mock_batch = _call_reconcile(
             spec={"templateRef": "my-template"},
             status=terminal,
             template=MINIMAL_TEMPLATE,

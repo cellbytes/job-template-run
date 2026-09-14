@@ -6,15 +6,15 @@ readme = "README.md"
 license = "EUPL-1.2"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28.0", "kopf>=1.44.5", "kubernetes>=36.0.1"]
+dependencies = ["httpx>=0.28.1", "kopf>=1.44.6", "kubernetes>=36.0.3"]
 
 [dependency-groups]
 dev = [
     "ty==0.0.80",
-    "pytest>=8.0.0",
-    "ruff>=0.11.5",
-    "kubernetes-stubs-elephant-fork>=36.0.1",
-    "commitizen>=4.6.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.7",
+    "kubernetes-stubs-elephant-fork>=36.0.3",
+    "commitizen>=4.18.1",
     "cz-changeup>=1.1.2",
 ]
 

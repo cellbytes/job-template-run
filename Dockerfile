@@ -1,7 +1,7 @@
-FROM python:3.13-alpine
+FROM python:3.14-alpine
 WORKDIR /app
 
-COPY --from=ghcr.io/astral-sh/uv:0.11.16 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.13 /uv /uvx /bin/
 
 ENV UV_LINK_MODE=copy
 ENV PATH="/app/.venv/bin:$PATH"

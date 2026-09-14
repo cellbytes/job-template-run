@@ -10,7 +10,6 @@ import kopf
 from kubernetes import client, config
 from kubernetes.client.exceptions import ApiException
 
-
 logger = logging.getLogger("kopf.controller")
 
 # Kubernetes label values are capped at 63 characters, and Job names must also
@@ -360,7 +359,7 @@ def job_status_update(name, namespace, status, meta, event=None, **_):
 
     try:
         callback_token = resolve_callback_token(annotations, namespace)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         # The referenced Secret is missing or malformed. Leave the callback
         # unsent so a later tick retries once the Secret is fixed.
         logger.warning(f"Cannot resolve callback token for job {name}: {e}")
@@ -386,7 +385,7 @@ def job_status_update(name, namespace, status, meta, event=None, **_):
                 f"Callback to {callback_url} returned {response.status_code}, "
                 "will retry on next tick"
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         # Network-level failure (app rolling out, DNS blip, timeout). Leave the
         # callback unsent so the next timer tick retries it.
         logger.warning(f"Failed to send callback to {callback_url}: {e}")
