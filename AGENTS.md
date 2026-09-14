@@ -53,3 +53,13 @@ Ensure no lint or type errors and the tests pass:
 ```sh
 uv run ruff check && uv run ruff format --check && make lint && make test
 ```
+
+## Commit messages
+
+Commits follow [conventional commits](https://www.conventionalcommits.org/), so
+that commitizen can derive the version bump and the changelog entry from them.
+
+Docs-only commits (nothing but Markdown or other documentation changed) carry
+`[skip ci]` in the commit message body. There is nothing for CI to verify, and
+the run would otherwise cut a release and bump the version for a change that
+ships no new behaviour.
