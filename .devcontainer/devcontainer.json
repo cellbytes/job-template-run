@@ -64,7 +64,7 @@
         "Tim-Koehler.helm-intellisense",
 
         "ms-python.python",
-        "ms-python.vscode-pylance",
+        "astral-sh.ty",
         "charliermarsh.ruff"
       ]
     }
