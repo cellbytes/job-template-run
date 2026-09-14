@@ -1,3 +1,17 @@
+## 1.1.1 (2026-09-14)
+
+### Fix
+
+- ci: pin setup-uv to an existing tag ([bea4780](https://github.com/cellbytes/job-template-run/commit/bea47809a03eb3be28f28ec5bfbcd0241b50c1c9))
+
+  astral-sh/setup-uv publishes no floating major tag, so @v10 does not
+
+  resolve and every workflow failed at action setup. Only v10.0.0, v10.0.1
+
+  and v10.1.0 exist.
+
+  Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
 ## 1.1.0 (2026-09-03)
 
 ### Feat
