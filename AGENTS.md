@@ -38,6 +38,21 @@ cannot reach kind's host-published API port but is on the `kind` docker network,
 and the target rewrites the kubeconfig accordingly. `make all` assumes a host
 with direct access to kind.
 
+## Python language server for coding agents
+
+Coding agents get ty diagnostics and navigation for Python in-session, from a
+Claude Code plugin this repo carries under `.claude/`. The devcontainer
+registers it in `postCreateCommand`; to do it by hand:
+
+```sh
+claude plugin marketplace add <repo root>/.claude
+claude plugin install ty-lsp@cellbytes-job-template-run
+```
+
+`.claude/lsp/ty-router.py` is a vendored copy owned by the `dev-env`
+repo - read its README for what the router does and why. Change it there and
+re-run that repo's `make sync-lsp-plugins`; do not edit the copy here.
+
 ## Conventions
 
 - Only use ASCII characters in code and comments. No em-dashes, en-dashes,

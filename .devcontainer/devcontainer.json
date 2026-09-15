@@ -46,7 +46,8 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": {
     "Install Python Dependencies": "uv sync",
-    "Fix Volume Permissions": "sudo chown -R $(whoami): /commandhistory"
+    "Fix Volume Permissions": "sudo chown -R $(whoami): /commandhistory",
+    "Install Python LSP plugin": "command -v claude >/dev/null 2>&1 && claude plugin marketplace add ${containerWorkspaceFolder}/.claude && claude plugin install ty-lsp@cellbytes-job-template-run || true"
   },
 
 

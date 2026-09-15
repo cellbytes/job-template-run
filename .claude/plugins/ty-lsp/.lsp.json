@@ -1,0 +1,7 @@
+{
+  "ty": {
+    "command": "${CLAUDE_PROJECT_DIR}/.claude/lsp/ty-router.py",
+    "extensionToLanguage": { ".py": "python", ".pyi": "python" },
+    "workspaceFolder": "${CLAUDE_PROJECT_DIR}"
+  }
+}

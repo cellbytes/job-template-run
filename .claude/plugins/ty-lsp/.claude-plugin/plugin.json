@@ -1,0 +1,6 @@
+{
+  "name": "ty-lsp",
+  "description": "Routes Python files to a ty language server per project",
+  "version": "1.0.0",
+  "author": { "name": "Cellbytes" }
+}

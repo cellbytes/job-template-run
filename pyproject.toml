@@ -24,11 +24,20 @@ pythonpath = ["."]
 # ty (https://docs.astral.sh/ty) - strictest possible configuration: every
 # diagnostic rule is promoted to an error and warnings fail the run too. Any
 # per-rule relaxation below carries the reason inline.
+[tool.ruff]
+# .claude/ vendors the Python LSP router, which is developer tooling shared
+# across repos rather than project code; linting it here would let an edit in
+# another repo fail this one's gate.
+extend-exclude = ["./.claude/"]
+
 [tool.ty.environment]
 root = ["."]
 
 [tool.ty.src]
-exclude = ["./.venv/"]
+# .claude/ holds the vendored Python LSP router, which is developer tooling
+# shared across repos rather than project code; typechecking it here would let
+# an edit in another repo fail this one's gate.
+exclude = ["./.venv/", "./.claude/"]
 
 [tool.ty.rules]
 all = "error"

@@ -1,0 +1,12 @@
+{
+  "name": "cellbytes-job-template-run",
+  "description": "Claude Code plugins maintained inside this Cellbytes repository",
+  "owner": { "name": "Cellbytes" },
+  "plugins": [
+    {
+      "name": "ty-lsp",
+      "source": "./plugins/ty-lsp",
+      "description": "Routes Python files to a ty language server per project"
+    }
+  ]
+}
