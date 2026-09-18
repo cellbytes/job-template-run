@@ -93,7 +93,7 @@ def find_project_root(path: Path, fallback: Path) -> Path:
     return fallback
 
 
-def resolve_ty_command(root: Path) -> list[str]:
+def resolve_ty_binary(root: Path) -> str:
     """Pick the ty binary for `root`, preferring the project's own venv.
 
     Projects pin different ty versions, and the point of the router is that a
@@ -101,11 +101,16 @@ def resolve_ty_command(root: Path) -> list[str]:
     """
     local = root / ".venv" / "bin" / "ty"
     if local.is_file():
-        return [str(local), "server"]
+        return str(local)
     found = shutil.which("ty")
     if found:
-        return [found, "server"]
+        return found
     raise RuntimeError(f"no ty binary for project {root}")
+
+
+def resolve_ty_command(root: Path) -> list[str]:
+    """Build the argv that starts a ty language server for `root`."""
+    return [resolve_ty_binary(root), "server"]
 
 
 def child_environment(root: Path) -> dict[str, str]:
@@ -360,6 +365,20 @@ def handle_client_response(state: dict[str, Any], message: dict[str, Any]) -> No
     send_to_child(child, {**message, "id": child_id})
 
 
+def delegate_cli(args: list[str]) -> int:
+    """Run a plain ty CLI invocation with the primary project's own ty.
+
+    VS Code's ty extension probes `<ty.path> --version` before it starts a
+    server and then hides every setting the version it read does not support.
+    A proxy that answers only LSP leaves that probe unanswered and loses those
+    settings, so hand the arguments to a real ty and return its exit code.
+    """
+    root = discover_primary_project(Path.cwd())
+    return subprocess.call(
+        [resolve_ty_binary(root), *args], cwd=str(root), env=child_environment(root)
+    )
+
+
 def main() -> None:
     stdin = sys.stdin.buffer
     state: dict[str, Any] = {
@@ -411,4 +430,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    # Both clients ask for a language server with `server` or with no argument
+    # at all; anything else is a CLI call that belongs to a real ty.
+    cli_args = [arg for arg in sys.argv[1:] if arg != "server"]
+    if cli_args:
+        sys.exit(delegate_cli(cli_args))
     main()
