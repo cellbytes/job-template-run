@@ -1,3 +1,25 @@
+## 1.1.2 (2026-09-18)
+
+### Fix
+
+- devcontainer: keep the ty router silent until the client can answer ([78b1d2a](https://github.com/cellbytes/job-template-run/commit/78b1d2a6456822edd0eb39c09f7b84cd421a125d))
+
+  A ty child asks `workspace/configuration` as soon as it is initialized, and the
+
+  router forwarded that request while the editor was still handling its own
+
+  initialize response. VS Code has no handler registered at that point and
+
+  answers -32601, which ty treats as fatal, leaving no Python language server at
+
+  all. The router now holds what children say until the client is ready for it,
+
+  and reports the ty version the client needs to gate its settings.
+
+  Vendored from dev-env, which owns the script.
+
+  Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
 ## 1.1.1 (2026-09-14)
 
 ### Fix
