@@ -170,12 +170,15 @@ def start_child(state: dict[str, Any], root: Path) -> dict[str, Any]:
         },
     )
     capabilities: dict[str, Any] = {}
+    server_info: dict[str, Any] = {}
     while True:
         message = read_frame(proc.stdout)
         if message is None:
             raise RuntimeError(f"ty server for {root} exited during initialize")
         if message.get("id") == handshake_id:
-            capabilities = message.get("result", {}).get("capabilities", {})
+            result = message.get("result", {})
+            capabilities = result.get("capabilities", {})
+            server_info = result.get("serverInfo", {})
             break
     write_frame(
         proc.stdin,
@@ -184,6 +187,7 @@ def start_child(state: dict[str, Any], root: Path) -> dict[str, Any]:
     )
 
     child["capabilities"] = capabilities
+    child["server_info"] = server_info
     state["children"][key] = child
     threading.Thread(target=pump_child, args=(state, child), daemon=True).start()
     log(f"started ty for {root}")
@@ -195,7 +199,30 @@ def send_to_child(child: dict[str, Any], message: dict[str, Any]) -> None:
 
 
 def send_upstream(state: dict[str, Any], message: dict[str, Any]) -> None:
+    """Write to the client, holding what children say until it can hear it."""
+    with state["ready_lock"]:
+        if not state["client_ready"]:
+            state["pending_upstream"].append(message)
+            return
     write_frame(state["stdout"], state["stdout_lock"], message)
+
+
+def release_upstream(state: dict[str, Any]) -> None:
+    """Flush what the children said while the client was still initializing.
+
+    A ty child asks `workspace/configuration` as soon as it is initialized, and
+    a client that has not finished handling its own initialize response has no
+    handler for that request yet. VS Code answers one with -32601, which ty
+    treats as fatal and shuts down on. The client registers its handlers while
+    processing that response, so nothing from a child may reach it before its
+    `initialized` notification arrives.
+    """
+    with state["ready_lock"]:
+        state["client_ready"] = True
+        pending = state["pending_upstream"]
+        state["pending_upstream"] = []
+    for message in pending:
+        write_frame(state["stdout"], state["stdout_lock"], message)
 
 
 def collect_fanout(state: dict[str, Any], message: dict[str, Any]) -> None:
@@ -344,6 +371,7 @@ def handle_notification(state: dict[str, Any], message: dict[str, Any]) -> None:
             child["proc"].terminate()
         sys.exit(0)
     if method == "initialized":
+        release_upstream(state)
         return
     if method in BROADCAST_NOTIFICATIONS:
         for child in list(state["children"].values()):
@@ -391,6 +419,9 @@ def main() -> None:
         "upstream": {},
         "upstream_lock": threading.Lock(),
         "next_upstream_id": 1,
+        "client_ready": False,
+        "pending_upstream": [],
+        "ready_lock": threading.Lock(),
     }
 
     initialize = read_frame(stdin)
@@ -405,14 +436,15 @@ def main() -> None:
     log(f"workspace {workspace}, primary project {state['seed_root']}")
 
     seed = start_child(state, state["seed_root"])
-    send_upstream(
-        state,
+    write_frame(
+        state["stdout"],
+        state["stdout_lock"],
         {
             "jsonrpc": "2.0",
             "id": initialize["id"],
             "result": {
                 "capabilities": seed["capabilities"],
-                "serverInfo": {"name": "ty-router", "version": "1"},
+                "serverInfo": seed["server_info"],
             },
         },
     )
