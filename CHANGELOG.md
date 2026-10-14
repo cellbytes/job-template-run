@@ -1,3 +1,21 @@
+## 1.1.3 (2026-10-14)
+
+### Fix
+
+- stop the reconcile timer once a JobRun is settled ([63a3c69](https://github.com/cellbytes/job-template-run/commit/63a3c69bb00df8367e95b3e22f635c614365bb8c))
+
+  Nothing deletes JobRuns, and the timer had no filter, so it ticked every
+
+  interval for every JobRun ever created. With kopf's --verbose logging that
+
+  is two log lines per run per tick, which grew without bound as runs
+
+  accumulated. The timer now only runs for JobRuns with no Job recorded and
+
+  no terminal state; on.create still handles new runs immediately.
+
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 ## 1.1.2 (2026-09-18)
 
 ### Fix
