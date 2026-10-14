@@ -252,6 +252,14 @@ def test_reconcile_skips_when_terminal():
         mock_batch.return_value.create_namespaced_job.assert_not_called()
 
 
+def test_jobrun_settled():
+    assert not controller.jobrun_settled(status={})
+    assert not controller.jobrun_settled(status=None)
+    assert not controller.jobrun_settled(status={"active": 1})
+    for settled in ({"jobName": "my-template-my-run"}, {"succeeded": 1}, {"failed": 1}):
+        assert controller.jobrun_settled(status=settled)
+
+
 def test_reconcile_adopts_existing_labeled_job():
     existing = mock.Mock()
     existing.metadata.name = "legacy-job-abc12"

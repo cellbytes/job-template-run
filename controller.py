@@ -166,17 +166,32 @@ def _fail_permanently(patch, message) -> NoReturn:
     raise kopf.PermanentError(message)
 
 
+def jobrun_settled(status, **_):
+    """Returns whether a JobRun has a Job recorded or has reached a terminal state.
+
+    A settled JobRun never gets another Job, even if the original has since been
+    garbage-collected or deleted: JobRuns are one-shot.
+    """
+    return bool(
+        status
+        and (status.get("jobName") or status.get("succeeded") or status.get("failed"))
+    )
+
+
 # The on.create handler reacts immediately; the timer is the reconcile backstop
 # for events missed while the controller was down (or dropped by the watch).
+# The timer is filtered to unsettled JobRuns because nothing deletes JobRuns:
+# unfiltered, it ticks (and kopf logs each tick) for every finished run forever.
 @kopf.on.create("cellbytes.io", "v1", "jobruns")
-@kopf.timer("cellbytes.io", "v1", "jobruns", interval=INTERVAL)
+@kopf.timer(
+    "cellbytes.io",
+    "v1",
+    "jobruns",
+    interval=INTERVAL,
+    when=kopf.not_(jobrun_settled),
+)
 def jobrun_reconcile(spec, name, namespace, patch, status, body, **_):
-    # One-shot semantics: once a Job has been recorded on the JobRun (or the
-    # JobRun reached a terminal state), never create another Job, even if the
-    # original Job has since been garbage-collected or deleted.
-    if status and (
-        status.get("jobName") or status.get("succeeded") or status.get("failed")
-    ):
+    if jobrun_settled(status):
         return
 
     # Fallback for JobRuns created before status.jobName existed: adopt an
