@@ -65,7 +65,9 @@ def build_labels(template_name, run_name):
         "app.kubernetes.io/version": os.getenv("APP_VERSION"),
         "app.kubernetes.io/managed-by": os.getenv("APP_MANAGED_BY"),
     }
-    labels = {key: value for key, value in env_labels.items() if value}
+    labels = {
+        key: value for key, value in env_labels.items() if value not in (None, "")
+    }
     labels["cellbytes.io/job-template"] = label_value(template_name)
     labels["cellbytes.io/job-run"] = label_value(run_name)
     return labels
