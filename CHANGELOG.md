@@ -1,3 +1,23 @@
+## 1.1.4 (2026-10-22)
+
+### Fix
+
+- deps: bump aiohttp, urllib3, certifi, multidict and kopf ([32f34b1](https://github.com/cellbytes/job-template-run/commit/32f34b163ebdf1e1f33351df773ba3241e1f5f42))
+
+  Clears the pip-audit findings in the shipped controller image
+
+  (aiohttp 3.14.4, urllib3 2.8.0, certifi 2026.10.19, multidict 6.9.1,
+
+  oauthlib 4.0.0) and bumps kopf to 1.45.1. kubernetes stays below 37:
+
+  its new client-side validation rejects the Job bodies the controller
+
+  sends, which needs a decision of its own. Also harmonizes ruff 0.17.1,
+
+  ty 0.0.90, commitizen 4.19.2 and uv 0.13.5.
+
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 ## 1.1.3 (2026-10-14)
 
 ### Fix
