@@ -1,0 +1,25 @@
+version: 2
+# Patch and minor updates of the GitHub Actions are grouped into one PR; majors
+# stay one PR each, and `open-pull-requests-limit` bounds how many of them can
+# pile up. The cooldown keeps a just-published (possibly compromised) release
+# out until it has been public for a week.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    open-pull-requests-limit: 4
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "02:40"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
