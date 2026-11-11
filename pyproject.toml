@@ -10,12 +10,12 @@ dependencies = ["httpx>=0.28.1", "kopf>=1.45.1", "kubernetes>=36.0.3,<37"]
 
 [dependency-groups]
 dev = [
-    "ty==0.0.90",
-    "pytest>=9.1.1",
-    "ruff==0.17.1",
+    "ty==0.0.100",
+    "pytest>=9.2.0",
+    "ruff==0.17.4",
     "kubernetes-stubs-elephant-fork>=36.0.3,<37",
-    "commitizen==4.19.2",
-    "cz-changeup>=1.1.2",
+    "commitizen==4.19.3",
+    "cz-changeup>=1.1.4",
 ]
 
 [tool.pytest.ini_options]
