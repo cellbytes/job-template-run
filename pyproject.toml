@@ -6,7 +6,7 @@ readme = "README.md"
 license = "EUPL-1.2"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28.1", "kopf>=1.45.1", "kubernetes>=36.0.3,<37"]
+dependencies = ["httpx>=0.28.1", "kopf>=1.45.2", "kubernetes>=36.0.3,<37"]
 
 [dependency-groups]
 dev = [
