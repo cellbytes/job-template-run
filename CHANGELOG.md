@@ -1,3 +1,24 @@
+## 1.1.5 (2026-11-11)
+
+### Fix
+
+- deps: bump python-dateutil to 4.0.0 ([4c1f7cd](https://github.com/cellbytes/job-template-run/commit/4c1f7cdf1df478bec5a5a177a6edf406057b03e0))
+
+  A transitive dependency of the kubernetes client. The major drops Python
+  older than 3.11 and the six dependency and makes isoparse stricter; the
+  controller targets 3.12+ and the client parses with dateutil.parser.parse.
+
+  Co-authored by Claude Opus 5.5.
+
+- deps: bump kopf, anyio, certifi, multidict and the other locked deps ([fe5d4a6](https://github.com/cellbytes/job-template-run/commit/fe5d4a60f9dc9f3fe9a393e950e02dc94ccc7f9a))
+
+  kopf 1.45.1 -> 1.45.2, anyio 4.15.1 -> 4.16.0, certifi 2026.10.19 ->
+  2026.10.23, multidict 7.1.0 -> 7.2.1, oauthlib 4.0.0 -> 4.0.1, jsonpatch
+  1.36 -> 1.47, jsonpointer 3.4 -> 3.12, wrapt 2.5.1 -> 2.5.2, click 8.5.0 ->
+  8.5.1, tzdata 2026.5 -> 2026.6 and wcwidth 0.9.3 -> 0.9.4.
+
+  Co-authored by Claude Opus 5.5.
+
 ## 1.1.4 (2026-10-22)
 
 ### Fix
